@@ -16,6 +16,13 @@ router.get("/", function (req, res, next) {
 router.get("/drivers", (req, res) => {
   models.driver
     .findAll({
+      include:{
+        models:models.company,
+        association: 'company',
+        attributes: 
+           ['name']
+        ,
+      },
       attributes: { exclude: ["creation_date", "avatar_url", "phone", "city"] },
     })
     .then((response) => {
@@ -28,7 +35,7 @@ router.get("/drivers", (req, res) => {
 
 /* Vehicles */
 // List vehicles by driver
-router.get("/driver/:id", (req, res) => {
+router.get("/drivers/:id", (req, res) => {
   let driver = req.params.id;
   models.vehicle
     .findAll({
@@ -36,6 +43,13 @@ router.get("/driver/:id", (req, res) => {
         driver_id: driver,
       },
       attributes: { exclude: ["creation_date"] },
+      include:{
+        models:models.driver,
+        association: 'driver',
+        attributes: 
+           ['first_name','last_name']
+        ,
+      }
     })
     .then((response) => {
       res.send(response);
@@ -46,7 +60,7 @@ router.get("/driver/:id", (req, res) => {
 });
 
 // Create a new vehicle
-router.post("vehicle/create", (req, res) => {
+router.post("/vehicle/create", (req, res) => {
   const { plate, model, type, capacity, driver_id } = req.body;
   models.vehicle
     .create({
@@ -57,7 +71,21 @@ router.post("vehicle/create", (req, res) => {
       driver_id: driver_id,
     })
     .then((response) => {
-      res.sendStatus(200).send("Successful Registration");
+      res.send(response);
+    })
+    .catch((err) => {
+      res.send(err);
+    });
+});
+
+//Get one vehicle
+router.get("/vehicle/:id", (req, res) => {
+  let id = req.params.id;
+  models.vehicle.findOne({
+    where:{id:id}
+    })
+    .then((response) => {
+      res.send(response);
     })
     .catch((err) => {
       res.send(err);
@@ -65,18 +93,21 @@ router.post("vehicle/create", (req, res) => {
 });
 
 //Update a existing vehicle
-router.put("vehicle/update", (req, res) => {
+router.put("/vehicle/update", (req, res) => {
   const { id, plate, model, type, capacity, driver_id } = req.body;
   models.vehicle
-    .update({
-      plate: plate,
-      model: model,
-      type: type,
-      capacity: capacity,
-      driver_id: driver_id,
-    },{where:{id:id}})
+    .update(
+      {
+        plate: plate,
+        model: model,
+        type: type,
+        capacity: capacity,
+        driver_id: driver_id,
+      },
+      { where: { id: id } }
+    )
     .then((response) => {
-      res.sendStatus(200).send("Successful Update");
+      res.send(response);
     })
     .catch((err) => {
       res.send(err);
@@ -84,9 +115,17 @@ router.put("vehicle/update", (req, res) => {
 });
 
 //Delete a vehicle
-router.delete("vehicle/delete/:id", (req, res) => {
+router.delete("/vehicle/delete/:id", (req, res) => {
   let id = req.params.id;
-  models.vehicle.destroy({ where: { id: id } });
+  console.log(id);
+  models.vehicle
+    .destroy({ where: { id: id } })
+    .then((response) => {
+      res.send({"message":"Successful Delete"});
+    })
+    .catch((err) => {
+      res.send(err);
+    });
 });
 
 module.exports = router;
