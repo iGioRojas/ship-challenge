@@ -6,7 +6,7 @@ Pequeño proyecto usando React en frontend y NodeJs con Express en el backend.
 
 ## Instalación
 El presente repositorio es un monorepo, es decir el frontend y el backend se encuentran en el mismo directorio.
-Clone el repositorio y escriba el comando `npm install` respectivamente en cada carpeta.
+Clone el repositorio y escriba el comando `npm install` en la carpeta backend y en la carpeta frontend.
 
 ### Iniciar backend
 `npm run devstart` nodemon
